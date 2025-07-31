@@ -1,0 +1,32 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fidelity-dev-5f5b5-authRole",
+      "UnauthRoleArn": "arn:aws:iam::766789220105:role/amplify-fidelity-dev-5f5b5-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::766789220105:role/amplify-fidelity-dev-5f5b5-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-fidelity-dev-5f5b5-deployment",
+      "UnauthRoleName": "amplify-fidelity-dev-5f5b5-unauthRole",
+      "StackName": "amplify-fidelity-dev-5f5b5",
+      "StackId": "arn:aws:cloudformation:us-east-1:766789220105:stack/amplify-fidelity-dev-5f5b5/06243d20-5aa4-11f0-aae1-12a63fc6123b",
+      "AmplifyAppId": "d1czxnce1yc88l"
+    },
+    "categories": {
+      "auth": {
+        "fidelityb76aa8db": {}
+      },
+      "function": {
+        "S3Triggerc2a24704": {
+          "deploymentBucketName": "amplify-fidelity-dev-5f5b5-deployment",
+          "s3Key": "amplify-builds/S3Triggerc2a24704-62693369355943634677-build.zip"
+        }
+      },
+      "storage": {
+        "receiptbucket": {}
+      },
+      "api": {
+        "fidelity": {}
+      }
+    }
+  }
+}

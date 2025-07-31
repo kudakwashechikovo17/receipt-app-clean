@@ -1,0 +1,22 @@
+type Receipt @model @auth(rules: [
+  { allow: owner, ownerField: "userId" },
+  { allow: groups, groups: ["admin"] }
+]) {
+  id: ID!
+  userId: String! @index(name: "byUserId")
+  fileName: String!
+  s3Key: String!
+  status: String!
+  vendor: String
+  total: String
+  receiptDate: String
+  extractedText: String
+  confidence: Float
+  lineItems: [LineItem]
+}
+
+type LineItem {
+  description: String
+  price: String
+  quantity: String
+}

@@ -1,0 +1,195 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  env:
+    Type: String
+  authRoleArn:
+    Type: String
+  unauthRoleArn:
+    Type: String
+  identityPoolName:
+    Type: String
+  allowUnauthenticatedIdentities:
+    Type: String
+  resourceNameTruncated:
+    Type: String
+  userPoolName:
+    Type: String
+  autoVerifiedAttributes:
+    Type: CommaDelimitedList
+  mfaConfiguration:
+    Type: String
+  mfaTypes:
+    Type: CommaDelimitedList
+  smsAuthenticationMessage:
+    Type: String
+  smsVerificationMessage:
+    Type: String
+  emailVerificationSubject:
+    Type: String
+  emailVerificationMessage:
+    Type: String
+  defaultPasswordPolicy:
+    Type: String
+  passwordPolicyMinLength:
+    Type: Number
+  passwordPolicyCharacters:
+    Type: CommaDelimitedList
+  requiredAttributes:
+    Type: CommaDelimitedList
+  aliasAttributes:
+    Type: CommaDelimitedList
+  userpoolClientGenerateSecret:
+    Type: String
+  userpoolClientRefreshTokenValidity:
+    Type: Number
+  userpoolClientWriteAttributes:
+    Type: CommaDelimitedList
+  userpoolClientReadAttributes:
+    Type: CommaDelimitedList
+  userpoolClientLambdaRole:
+    Type: String
+  userpoolClientSetAttributes:
+    Type: String
+  sharedId:
+    Type: String
+  resourceName:
+    Type: String
+  authSelections:
+    Type: String
+  useDefault:
+    Type: String
+  userPoolGroupList:
+    Type: CommaDelimitedList
+  serviceName:
+    Type: String
+  usernameCaseSensitive:
+    Type: String
+  useEnabledMfas:
+    Type: String
+
+Resources:
+  # Additional IAM role for Textract permissions
+  TextractRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${resourceName}-textract-role-${env}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                'cognito-identity.amazonaws.com:aud': !Ref IdentityPool
+              'ForAnyValue:StringLike':
+                'cognito-identity.amazonaws.com:amr': authenticated
+      Policies:
+        - PolicyName: TextractPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - textract:DetectDocumentText
+                  - textract:AnalyzeDocument
+                Resource: '*'
+
+  # Existing resources from original template
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Ref userPoolName
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+      AutoVerifiedAttributes: !Ref autoVerifiedAttributes
+      EmailVerificationMessage: !Ref emailVerificationMessage
+      EmailVerificationSubject: !Ref emailVerificationSubject
+      Policies:
+        PasswordPolicy:
+          MinimumLength: !Ref passwordPolicyMinLength
+          RequireLowercase: false
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: false
+      MfaConfiguration: !Ref mfaConfiguration
+      SmsVerificationMessage: !Ref smsVerificationMessage
+      SmsAuthenticationMessage: !Ref smsAuthenticationMessage
+
+  UserPoolClientWeb:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub ${resourceName}_app_clientWeb
+      UserPoolId: !Ref UserPool
+      GenerateSecret: !Ref userpoolClientGenerateSecret
+      RefreshTokenValidity: !Ref userpoolClientRefreshTokenValidity
+      ReadAttributes: !Ref userpoolClientReadAttributes
+      WriteAttributes: !Ref userpoolClientWriteAttributes
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub ${resourceName}_app_client
+      UserPoolId: !Ref UserPool
+      GenerateSecret: !Ref userpoolClientGenerateSecret
+      RefreshTokenValidity: !Ref userpoolClientRefreshTokenValidity
+
+  IdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: !Ref identityPoolName
+      AllowUnauthenticatedIdentities: !Ref allowUnauthenticatedIdentities
+      CognitoIdentityProviders:
+        - ClientId: !Ref UserPoolClient
+          ProviderName: !Sub
+            - cognito-idp.${region}.amazonaws.com/${client}
+            - region: !Ref 'AWS::Region'
+              client: !Ref UserPool
+        - ClientId: !Ref UserPoolClientWeb
+          ProviderName: !Sub
+            - cognito-idp.${region}.amazonaws.com/${client}
+            - region: !Ref 'AWS::Region'
+              client: !Ref UserPool
+
+  # Add Textract policy to existing auth role
+  TextractPolicyAttachment:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: TextractPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - textract:DetectDocumentText
+              - textract:AnalyzeDocument
+            Resource: '*'
+      Roles:
+        - !Ref authRoleArn
+
+  IdentityPoolRoleMap:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      Roles:
+        authenticated: !Ref authRoleArn
+
+Outputs:
+  IdentityPoolId:
+    Value: !Ref IdentityPool
+  IdentityPoolName:
+    Value: !GetAtt IdentityPool.Name
+  UserPoolId:
+    Value: !Ref UserPool
+  UserPoolArn:
+    Value: !GetAtt UserPool.Arn
+  UserPoolName:
+    Value: !Ref userPoolName
+  AppClientIDWeb:
+    Value: !Ref UserPoolClientWeb
+  AppClientID:
+    Value: !Ref UserPoolClient

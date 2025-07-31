@@ -1,0 +1,12 @@
+{
+  "resourceName": "receiptbucket",
+  "policyUUID": "5c47c5a8",
+  "bucketName": "fidelity8590b7c71d4f4d8e8734806c975c3f34",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE"
+  ],
+  "triggerFunction": "S3Triggerc2a24704",
+  "groupAccess": {}
+}

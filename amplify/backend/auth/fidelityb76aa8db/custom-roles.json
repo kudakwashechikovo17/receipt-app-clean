@@ -1,0 +1,15 @@
+{
+  "authRolePolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "textract:DetectDocumentText",
+          "textract:AnalyzeDocument"
+        ],
+        "Resource": "*"
+      }
+    ]
+  }
+}

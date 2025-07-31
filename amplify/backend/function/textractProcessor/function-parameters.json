@@ -1,0 +1,9 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "storageReceiptsBucketName",
+      "environmentVariableName": "STORAGE_RECEIPTS_BUCKETNAME"
+    }
+  ]
+}
