@@ -190,3 +190,6 @@ For issues or questions, please check the AWS documentation or contact the devel
 ---
 
 **Note**: This application uses AWS services that may incur charges. Monitor your AWS billing dashboard regularly.
+
+## Test Update
+This is a test update to verify GitHub sync.
