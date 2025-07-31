@@ -20,7 +20,7 @@ This app lets you upload receipt images, automatically extract text using AI (Am
 
 
 
-## 🐳 Docker Deployment
+## Docker Deployment
  Build Docker Image
 ```bash
 docker build -t <dockerhub-username>/receipt-app:v1 .
@@ -60,7 +60,7 @@ Reload HAProxy:
 docker exec -it lb-01 sh -c 'haproxy -sf $(pidof haproxy) -f /etc/haproxy/haproxy.cfg'
 ```
 
-## 🔑 API Integration
+ API Integration
 
 ### Amazon Textract
  Extract text from receipt images
@@ -72,80 +72,16 @@ AWS Textract DetectDocumentText API
 - Authentication: AWS Cognito User Pools
 - Database: Amazon DynamoDB
 
-## 🎯 User Interaction Features
+##  User Interaction Features
 
  Upload & Process
    - Drag & drop or click to upload
    - File validation (type, size)
    - Real-time processing status
 
- **Data Management**
-   - View extracted text with confidence scores
-   - Delete unwanted receipts
-   - Auto-refresh for real-time updates
 
-## 🛡 Security Features
+Once your receipt is processed, you can easily view the extracted text along with confidence scores, delete anything you don’t need, and enjoy automatic updates every few seconds — no need to refresh manually.
 
-- AWS Cognito authentication
-- Secure API key handling (not exposed in code)
-- Input validation and sanitization
-- HTTPS enforcement
-- Security headers in nginx config
+User authentication is handled through AWS Cognito, API keys are kept safe and out of the codebase, all inputs are sanitized, and HTTPS is enforced with secure headers configured in Nginx — so your data stays protected at every step.
 
-## 🚨 Error Handling
-
-- Network connectivity issues
-- API rate limiting
-- File upload failures
-- Authentication errors
-- Invalid file formats
-- Processing timeouts
-
-## 📊 Testing Load Balancer
-
-Test round-robin distribution:
-```bash
-for i in {1..10}; do
-  curl -s http://localhost | grep -o "web-0[12]" || echo "Response $i"
-done
-```
-
-## 💡 Performance Optimizations
-
-- Gzip compression enabled
-- Image optimization recommendations
-- Caching for API responses
-- Lazy loading for large datasets
-- Debounced search functionality
-
-## 🔮 Future Enhancements
-
-- Receipt categorization
-- Expense reporting
-- OCR accuracy improvements
-- Mobile app version
-- Bulk upload functionality
-
-## 📝 Credits
-
-- **Amazon Textract**: AI-powered text extraction
-- **AWS Amplify**: Backend infrastructure
-- **React**: Frontend framework
-- **Docker**: Containerization platform
-
-## 🐛 Known Issues
-
-- Large files (>10MB) may timeout
-- Processing time varies with image complexity
-- Requires stable internet connection
-
-## 📞 Support
-
-For issues or questions, please check the AWS documentation or contact the development team.
-
----
-
-**Note**: This application uses AWS services that may incur charges. Monitor your AWS billing dashboard regularly.
-
-## Test Update
-This is a test update to verify GitHub sync.
+The app is built to handle real-world hiccups like network drops, upload failures, API rate limits, invalid file formats, and even authentication issues — so you stay informed without getting stuck.
