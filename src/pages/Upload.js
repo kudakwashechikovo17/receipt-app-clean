@@ -97,7 +97,7 @@ export default function Upload({ user }) {
         region: 'us-east-1'
       });
       
-      console.log('Processing receipt:', uploadedReceipt.s3Key);
+      console.log('Processing receipt with Textract:', uploadedReceipt.s3Key);
       
       const command = new DetectDocumentTextCommand({
         Document: {
@@ -151,54 +151,158 @@ export default function Upload({ user }) {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px' }}>
-      <h1>📄 Receipt Upload & AI Text Extraction</h1>
-      <p style={{ color: '#666', marginBottom: '2rem' }}>Upload receipt images and extract text using Amazon Textract AI</p>
-      
-      <div style={{ border: '2px dashed #ccc', padding: '2rem', marginBottom: '1rem', textAlign: 'center' }}>
-        <input 
-          type="file" 
-          accept="image/*" 
-          onChange={(e) => setFile(e.target.files[0])}
-          style={{ marginBottom: '1rem' }}
-        />
-        {file && (
-          <div style={{ marginTop: '1rem', color: '#666' }}>
-            <p>📎 Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</p>
+    <div style={{ 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      padding: '2rem'
+    }}>
+      <div style={{
+        maxWidth: '900px',
+        margin: '0 auto',
+        backgroundColor: 'white',
+        borderRadius: '20px',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+        overflow: 'hidden'
+      }}>
+        {/* Header */}
+        <div style={{
+          background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          padding: '3rem 2rem',
+          textAlign: 'center',
+          color: 'white'
+        }}>
+          <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '700' }}>📄 Receipt Manager</h1>
+          <p style={{ margin: '1rem 0 0', fontSize: '1.2rem', opacity: 0.9 }}>AI-Powered Text Extraction with Amazon Textract</p>
+        </div>
+
+        <div style={{ padding: '3rem 2rem' }}>
+          {/* Upload Zone */}
+          <div style={{
+            border: file ? '3px solid #4facfe' : '3px dashed #e0e6ed',
+            borderRadius: '15px',
+            padding: '3rem',
+            textAlign: 'center',
+            backgroundColor: file ? '#f8fbff' : '#fafbfc',
+            transition: 'all 0.3s ease',
+            marginBottom: '2rem'
+          }}>
+            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>☁️</div>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={(e) => setFile(e.target.files[0])}
+              style={{
+                padding: '1rem',
+                border: '2px solid #e0e6ed',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                marginBottom: '1rem',
+                width: '100%',
+                maxWidth: '400px'
+              }}
+            />
+            {file && (
+              <div style={{
+                marginTop: '1.5rem',
+                padding: '1rem',
+                backgroundColor: '#e8f5e8',
+                borderRadius: '10px',
+                border: '1px solid #4caf50'
+              }}>
+                <p style={{ margin: 0, color: '#2e7d32', fontWeight: '600' }}>
+                  ✅ {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      
-      <div style={{ marginBottom: '2rem' }}>
-        <Button 
-          onClick={handleUpload} 
-          disabled={!file || isUploading}
-          style={{ marginRight: '1rem' }}
-        >
-          {isUploading ? '⏳ Uploading...' : '📤 Upload Receipt'}
-        </Button>
-        
-        {uploadedReceipt && (
-          <Button 
-            onClick={handleExtract} 
-            disabled={isExtracting}
-            style={{ backgroundColor: '#007bff', color: 'white' }}
-          >
-            {isExtracting ? '🤖 Processing...' : '🤖 Extract Text with AI'}
-          </Button>
-        )}
-      </div>
-      
-      {status && <Alert style={{ padding: '1rem' }}>{status}</Alert>}
-      
-      <div style={{ marginTop: '2rem', fontSize: '0.9em', color: '#666' }}>
-        <h3>💡 Tips:</h3>
-        <ul>
-          <li>Supported formats: JPEG, PNG, GIF</li>
-          <li>Maximum file size: 10MB</li>
-          <li>For best results, ensure receipt is clear and well-lit</li>
-          <li>Processing uses Amazon Textract (~$0.0015 per page)</li>
-        </ul>
+          
+          {/* Action Buttons */}
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <button
+              onClick={handleUpload}
+              disabled={!file || isUploading}
+              style={{
+                background: isUploading ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                padding: '1rem 2rem',
+                borderRadius: '50px',
+                fontSize: '1.1rem',
+                fontWeight: '600',
+                cursor: !file || isUploading ? 'not-allowed' : 'pointer',
+                marginRight: '1rem',
+                boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {isUploading ? '⏳ Uploading...' : '📤 Upload Receipt'}
+            </button>
+            
+            {uploadedReceipt && (
+              <button
+                onClick={handleExtract}
+                disabled={isExtracting}
+                style={{
+                  background: isExtracting ? '#ccc' : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '1rem 2rem',
+                  borderRadius: '50px',
+                  fontSize: '1.1rem',
+                  fontWeight: '600',
+                  cursor: isExtracting ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 8px 20px rgba(79, 172, 254, 0.3)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                {isExtracting ? '🤖 Processing...' : '🤖 Extract with AI'}
+              </button>
+            )}
+          </div>
+          
+          {/* Status Alert */}
+          {status && (
+            <div style={{
+              padding: '1.5rem',
+              borderRadius: '15px',
+              backgroundColor: status.includes('✅') ? '#e8f5e8' : status.includes('❌') ? '#ffebee' : '#e3f2fd',
+              border: `2px solid ${status.includes('✅') ? '#4caf50' : status.includes('❌') ? '#f44336' : '#2196f3'}`,
+              marginBottom: '2rem',
+              fontSize: '1.1rem',
+              fontWeight: '500'
+            }}>
+              {status}
+            </div>
+          )}
+          
+          {/* Tips Section */}
+          <div style={{
+            backgroundColor: '#f8f9fa',
+            borderRadius: '15px',
+            padding: '2rem',
+            border: '1px solid #e9ecef'
+          }}>
+            <h3 style={{ color: '#495057', marginBottom: '1rem', fontSize: '1.3rem' }}>💡 Pro Tips</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', color: '#6c757d' }}>
+                <span style={{ marginRight: '0.5rem', fontSize: '1.2rem' }}>📁</span>
+                <span>JPEG, PNG, GIF supported</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', color: '#6c757d' }}>
+                <span style={{ marginRight: '0.5rem', fontSize: '1.2rem' }}>📏</span>
+                <span>Max 10MB file size</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', color: '#6c757d' }}>
+                <span style={{ marginRight: '0.5rem', fontSize: '1.2rem' }}>💡</span>
+                <span>Clear, well-lit images work best</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', color: '#6c757d' }}>
+                <span style={{ marginRight: '0.5rem', fontSize: '1.2rem' }}>💰</span>
+                <span>~$0.0015 per page processed</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
